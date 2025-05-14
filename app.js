@@ -102,3 +102,47 @@ window.addEventListener("load", () => {
     showApp();
   }
 });
+
+// 🚪 Выход
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("pwa-user");
+  location.reload();
+});
+
+// 💾 Установка на устройство
+let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = "inline-block";
+
+  installBtn.addEventListener("click", () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choice) => {
+        if (choice.outcome === "accepted") {
+          console.log("Установка подтверждена");
+        }
+        deferredPrompt = null;
+        installBtn.style.display = "none";
+      });
+    }
+  });
+});
+
+// 🔔 Push-уведомления
+const notifyBtn = document.getElementById("notifyBtn");
+notifyBtn.addEventListener("click", () => {
+  Notification.requestPermission().then((perm) => {
+    if (perm === "granted") {
+      new Notification("Уведомления включены 🎉", {
+        body: "Теперь вы будете получать новости!",
+        icon: "/icons/icon-192.png",
+      });
+    } else {
+      alert("Разрешите уведомления в настройках браузера");
+    }
+  });
+});

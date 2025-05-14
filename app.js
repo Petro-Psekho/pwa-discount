@@ -113,23 +113,36 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 let deferredPrompt;
 const installBtn = document.getElementById("installBtn");
 
+// Проверка, установлено ли уже PWA
+const isInStandaloneMode = () =>
+  window.matchMedia("(display-mode: standalone)").matches ||
+  window.navigator.standalone === true;
+
+if (!isInStandaloneMode()) {
+  installBtn.style.display = "inline-block";
+}
+
+// Сохраняем событие установки
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
   installBtn.style.display = "inline-block";
+});
 
-  installBtn.addEventListener("click", () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choice) => {
-        if (choice.outcome === "accepted") {
-          console.log("Установка подтверждена");
-        }
-        deferredPrompt = null;
+// Кнопка установки
+installBtn.addEventListener("click", () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === "accepted") {
+        console.log("Пользователь установил приложение");
         installBtn.style.display = "none";
-      });
-    }
-  });
+      } else {
+        console.log("Пользователь отменил установку");
+      }
+      deferredPrompt = null;
+    });
+  }
 });
 
 // 🔔 Push-уведомления

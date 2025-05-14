@@ -1,55 +1,38 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Колесо скидок</title>
-    <link rel="manifest" href="manifest.json" />
-    <link rel="stylesheet" href="style.css" />
-    <script defer src="app.js"></script>
-  </head>
-  <body>
-    <div id="loginSection">
-      <h2>Введите ваше имя:</h2>
-      <input type="text" id="username" placeholder="Ваше имя" />
-      <button id="loginBtn">Войти</button>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PWA Колесо Скидок</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <meta name="theme-color" content="#ffffff" />
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    #wheel { width: 300px; height: 300px; margin: 20px auto; border: 10px solid #ddd; border-radius: 50%; position: relative; }
+    #spinBtn { padding: 10px 20px; font-size: 16px; }
+    #installBtn { display: none; margin-top: 10px; }
+    #iosBanner { display:none; position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); padding: 15px; z-index: 1000; }
+  </style>
+</head>
+<body>
+  <h1>Крути колесо и получи скидку!</h1>
+  <div id="wheel">🎁</div>
+  <button id="spinBtn">Крутить</button>
+  <p id="result"></p>
+  <button id="installBtn">📲 Установить приложение</button>
 
-    <div id="appSection" style="display:none;">
-      <h1>Привет, <span id="userNameDisplay"></span>!</h1>
-      
-      <div id="wheel" class="wheel"></div>
-      <button id="spinButton">🎡 Крутить колесо</button>
-      <p id="result"></p>
-    
-      <h3>История выигрышей:</h3>
-      <ul id="historyList"></ul>
-    
-      <br />
-      <button id="installBtn" style="display: none;">📲 Установить приложение</button>
-      <button id="notifyBtn">🔔 Включить уведомления</button>
-      <button id="logoutBtn">🚪 Выйти</button>
-    </div>
-
-    <div id="iosInstallHint" style="display: none; margin-top: 10px; padding: 10px; background: #fff4c4; border-radius: 8px;">
-      Чтобы установить приложение, нажмите <strong>«Поделиться»</strong> и выберите <strong>«На экран домой»</strong>.
-    </div>
-
-    <div id="iosBanner" style="display:none; position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); padding: 15px; z-index: 1000; font-family: sans-serif;">
-      <div style="display: flex; align-items: center;">
-        <img src="/icons/icon-192.png" alt="App Icon" style="width: 48px; height: 48px; border-radius: 12px; margin-right: 10px;">
-        <div style="flex: 1;">
-          <div style="font-weight: bold; font-size: 16px;">Установи наше приложение</div>
-          <div style="font-size: 14px; color: #555;">Нажми «Поделиться» и выбери «На экран домой»</div>
-        </div>
-        <button id="closeIosBanner" style="background: none; border: none; font-size: 20px; line-height: 1; margin-left: 10px;">✕</button>
+  <div id="iosBanner">
+    <div style="display: flex; align-items: center;">
+      <img src="icons/icon-192.png" alt="App Icon" style="width: 48px; height: 48px; margin-right: 10px;">
+      <div style="flex: 1;">
+        <div style="font-weight: bold;">Установи приложение</div>
+        <div style="font-size: 14px;">Нажми «Поделиться» → «На экран домой»</div>
       </div>
+      <button id="closeIosBanner" style="margin-left: 10px;">✕</button>
     </div>
-    
-    
+  </div>
 
-      <h3>История выигрышей:</h3>
-      <ul id="historyList"></ul>
-    </div>
-  </body>
+  <script src="app.js"></script>
+</body>
 </html>

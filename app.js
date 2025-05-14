@@ -11,6 +11,8 @@ const appSection = document.getElementById("appSection");
 const historyList = document.getElementById("historyList");
 const installBtn = document.getElementById("installBtn");
 
+let currentRotation = 0;
+
 loginBtn.addEventListener("click", () => {
   const name = usernameInput.value.trim();
   if (name) {
@@ -26,13 +28,30 @@ logoutBtn.addEventListener("click", () => {
 });
 
 spinBtn.addEventListener("click", () => {
+  spinBtn.disabled = true;
+  result.textContent = "Крутим...";
+
   const index = Math.floor(Math.random() * prizes.length);
   const prize = prizes[index];
-  result.textContent = "Вы выиграли: " + prize + "!";
-  const history = JSON.parse(localStorage.getItem("history")) || [];
-  history.push(prize);
-  localStorage.setItem("history", JSON.stringify(history));
-  renderHistory();
+  const degreesPerSegment = 360 / prizes.length;
+  const randomOffset = Math.floor(Math.random() * (degreesPerSegment - 5)); // небольшой разброс
+  const segmentRotation = 360 * 5 + index * degreesPerSegment + randomOffset;
+
+  currentRotation += segmentRotation;
+
+  wheel.style.transition = "transform 4s cubic-bezier(0.33, 1, 0.68, 1)";
+  wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+  setTimeout(() => {
+    result.textContent = "Вы выиграли: " + prize + "!";
+
+    const history = JSON.parse(localStorage.getItem("history")) || [];
+    history.push(prize);
+    localStorage.setItem("history", JSON.stringify(history));
+    renderHistory();
+
+    spinBtn.disabled = false;
+  }, 4000);
 });
 
 function renderHistory() {
@@ -84,23 +103,3 @@ if ("serviceWorker" in navigator) {
     console.log("[PWA] Service Worker зарегистрирован");
   });
 }
-
-spinBtn.addEventListener("click", () => {
-  const index = Math.floor(Math.random() * prizes.length);
-  const prize = prizes[index];
-  result.textContent = "Вы выиграли: " + prize + "!";
-
-  // Включаем анимацию вращения
-  wheel.classList.add("spin");
-
-  // Ожидаем окончания анимации и убираем класс вращения
-  setTimeout(() => {
-    wheel.classList.remove("spin");
-  }, 4000); // Время анимации в миллисекундах (4 секунды)
-
-  // Сохранение выигрыша в историю
-  const history = JSON.parse(localStorage.getItem("history")) || [];
-  history.push(prize);
-  localStorage.setItem("history", JSON.stringify(history));
-  renderHistory();
-});

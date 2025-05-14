@@ -159,3 +159,39 @@ notifyBtn.addEventListener("click", () => {
     }
   });
 });
+
+function isIos() {
+  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+}
+
+function isInStandaloneMode() {
+  return "standalone" in window.navigator && window.navigator.standalone;
+}
+
+if (isIos() && !isInStandaloneMode()) {
+  document.getElementById("iosInstallHint").style.display = "block";
+}
+
+function isIos() {
+  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+}
+
+function isInStandaloneMode() {
+  return "standalone" in window.navigator && window.navigator.standalone;
+}
+
+// Показываем кастомный баннер только если iOS и не установлено
+if (isIos() && !isInStandaloneMode()) {
+  const banner = document.getElementById("iosBanner");
+  const closeBtn = document.getElementById("closeIosBanner");
+
+  // Не показывать повторно, если пользователь уже закрыл баннер
+  if (!localStorage.getItem("iosBannerDismissed")) {
+    banner.style.display = "block";
+  }
+
+  closeBtn.addEventListener("click", () => {
+    banner.style.display = "none";
+    localStorage.setItem("iosBannerDismissed", "true");
+  });
+}

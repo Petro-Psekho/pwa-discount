@@ -5,6 +5,15 @@ body {
   color: #333;
 }
 
+@keyframes spinWheel {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .wheel {
   width: 200px;
   height: 200px;
@@ -19,4 +28,9 @@ body {
   border-radius: 50%;
   margin: 20px auto;
   border: 5px solid #333;
+  transition: transform 4s ease-out; /* Плавный переход */
+}
+
+.spin {
+  animation: spinWheel 4s ease-out; /* Анимация вращения */
 }

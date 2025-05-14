@@ -84,3 +84,23 @@ if ("serviceWorker" in navigator) {
     console.log("[PWA] Service Worker зарегистрирован");
   });
 }
+
+spinBtn.addEventListener("click", () => {
+  const index = Math.floor(Math.random() * prizes.length);
+  const prize = prizes[index];
+  result.textContent = "Вы выиграли: " + prize + "!";
+
+  // Включаем анимацию вращения
+  wheel.classList.add("spin");
+
+  // Ожидаем окончания анимации и убираем класс вращения
+  setTimeout(() => {
+    wheel.classList.remove("spin");
+  }, 4000); // Время анимации в миллисекундах (4 секунды)
+
+  // Сохранение выигрыша в историю
+  const history = JSON.parse(localStorage.getItem("history")) || [];
+  history.push(prize);
+  localStorage.setItem("history", JSON.stringify(history));
+  renderHistory();
+});

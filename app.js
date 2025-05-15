@@ -10,6 +10,9 @@ const loginSection = document.getElementById("loginSection");
 const appSection = document.getElementById("appSection");
 const historyList = document.getElementById("historyList");
 const installBtn = document.getElementById("installBtn");
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+const installModal = document.getElementById("installModal");
+const closeModalBtn = document.getElementById("closeModalBtn");
 
 let currentRotation = 0;
 
@@ -86,7 +89,11 @@ window.addEventListener("beforeinstallprompt", (e) => {
 });
 
 installBtn.addEventListener("click", () => {
-  if (deferredPrompt) {
+  if (isMobile) {
+    // Показываем модальное окно с инструкцией
+    installModal.style.display = "block";
+  } else if (deferredPrompt) {
+    // Десктопное стандартное поведение
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then((choice) => {
       if (choice.outcome === "accepted") {
@@ -103,3 +110,7 @@ if ("serviceWorker" in navigator) {
     console.log("[PWA] Service Worker зарегистрирован");
   });
 }
+
+closeModalBtn.addEventListener("click", () => {
+  installModal.style.display = "none";
+});

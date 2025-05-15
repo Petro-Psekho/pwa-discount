@@ -15,20 +15,37 @@
       <button id="loginBtn">Войти</button>
     </div>
 
-    <div id="appSection" style="display:none;">
+    <div id="appSection" style="display: none">
       <h1>Привет, <span id="userNameDisplay"></span>!</h1>
-      
+
       <div id="wheel" class="wheel"></div>
       <button id="spinBtn">🎡 Крутить колесо</button>
       <p id="result"></p>
-    
+
       <h3>История выигрышей:</h3>
       <ul id="historyList"></ul>
-    
+
       <br />
-      <button id="installBtn" style="display: none;">📲 Установить приложение</button>
+      <button id="installBtn" style="display: none">
+        📲 Установить приложение
+      </button>
       <button id="notifyBtn">🔔 Включить уведомления</button>
       <button id="logoutBtn">🚪 Выйти</button>
+    </div>
+
+    <div id="installModal" class="modal">
+      <div class="modal-content">
+        <span id="closeModalBtn" class="close">&times;</span>
+        <h3>Как установить приложение:</h3>
+        <p>
+          <strong>На Android:</strong> нажмите меню браузера (⋮) и выберите
+          «Установить приложение».
+        </p>
+        <p>
+          <strong>На iPhone:</strong> нажмите кнопку «Поделиться» и выберите «На
+          экран “Домой”».
+        </p>
+      </div>
     </div>
   </body>
 </html>

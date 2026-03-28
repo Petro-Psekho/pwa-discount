@@ -1,4 +1,4 @@
-const prizes = ["5%", "10%", "15%", "20%", "Проигрыш", "Бесплатная доставка"];
+﻿const prizes = ["5%", "10%", "15%", "20%", "Проигрыш", "Бесплатная доставка"];
 const wheel = document.getElementById("wheel");
 const result = document.getElementById("result");
 const spinBtn = document.getElementById("spinBtn");
@@ -9,6 +9,7 @@ const userNameDisplay = document.getElementById("userNameDisplay");
 const loginSection = document.getElementById("loginSection");
 const appSection = document.getElementById("appSection");
 const historyList = document.getElementById("historyList");
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 const installBtn = document.getElementById("installBtn");
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 const installModal = document.getElementById("installModal");
@@ -28,6 +29,12 @@ logoutBtn.addEventListener("click", () => {
   localStorage.removeItem("username");
   appSection.style.display = "none";
   loginSection.style.display = "block";
+});
+
+clearHistoryBtn.addEventListener("click", () => {
+  localStorage.removeItem("history");
+  historyList.innerHTML = "";
+  result.textContent = "История выигрышей удалена.";
 });
 
 spinBtn.addEventListener("click", () => {

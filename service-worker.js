@@ -1,4 +1,4 @@
-const CACHE_NAME = "discount-pwa-v3";
+﻿const CACHE_NAME = "discount-pwa-v4";
 const FILES_TO_CACHE = ["index.html", "app.js", "style.css", "manifest.json"];
 
 console.log("[SW] Service worker установлен!");
@@ -18,6 +18,7 @@ self.addEventListener("activate", (evt) => {
           if (key !== CACHE_NAME) {
             return caches.delete(key);
           }
+          return Promise.resolve();
         })
       )
     )
@@ -26,7 +27,22 @@ self.addEventListener("activate", (evt) => {
 });
 
 self.addEventListener("fetch", (evt) => {
-  evt.respondWith(
-    caches.match(evt.request).then((response) => response || fetch(evt.request))
-  );
+  const url = new URL(evt.request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+  const isAppShellAsset = FILES_TO_CACHE.some((file) => url.pathname.endsWith(file));
+
+  if (isSameOrigin && isAppShellAsset) {
+    evt.respondWith(
+      fetch(evt.request)
+        .then((networkResponse) => {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(evt.request, responseClone));
+          return networkResponse;
+        })
+        .catch(() => caches.match(evt.request))
+    );
+    return;
+  }
+
+  evt.respondWith(caches.match(evt.request).then((response) => response || fetch(evt.request)));
 });

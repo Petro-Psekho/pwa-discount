@@ -136,7 +136,7 @@ button:disabled {
 }
 
 #installBtn,
-#notifyBtn,
+#clearHistoryBtn,
 #logoutBtn {
   margin-top: 10px;
   margin-right: 8px;
@@ -225,7 +225,7 @@ button:disabled {
 
   #spinBtn,
   #installBtn,
-  #notifyBtn,
+  #clearHistoryBtn,
   #logoutBtn,
   #loginBtn {
     width: 100%;

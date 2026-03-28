@@ -1,151 +1,263 @@
-﻿const prizes = ["5%", "10%", "15%", "20%", "Проигрыш", "Бесплатная доставка"];
-const wheel = document.getElementById("wheel");
-const result = document.getElementById("result");
-const spinBtn = document.getElementById("spinBtn");
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const usernameInput = document.getElementById("username");
-const userNameDisplay = document.getElementById("userNameDisplay");
-const loginSection = document.getElementById("loginSection");
-const appSection = document.getElementById("appSection");
-const historyTitle = document.getElementById("historyTitle");
-const historyList = document.getElementById("historyList");
-const clearHistoryBtn = document.getElementById("clearHistoryBtn");
-const installBtn = document.getElementById("installBtn");
+﻿const PRIZES = ["5%", "10%", "15%", "20%", "Проигрыш", "Бесплатная доставка"];
+const STORAGE_KEYS = {
+  username: "username",
+  history: "history",
+};
+const SPIN_DURATION_MS = 4000;
+const SPIN_EASING = "transform 4s cubic-bezier(0.33, 1, 0.68, 1)";
+
+const el = {
+  wheel: document.getElementById("wheel"),
+  result: document.getElementById("result"),
+  spinBtn: document.getElementById("spinBtn"),
+  loginBtn: document.getElementById("loginBtn"),
+  logoutBtn: document.getElementById("logoutBtn"),
+  usernameInput: document.getElementById("username"),
+  userNameDisplay: document.getElementById("userNameDisplay"),
+  loginSection: document.getElementById("loginSection"),
+  appSection: document.getElementById("appSection"),
+  historyTitle: document.getElementById("historyTitle"),
+  historyList: document.getElementById("historyList"),
+  clearHistoryBtn: document.getElementById("clearHistoryBtn"),
+  installBtn: document.getElementById("installBtn"),
+  installModal: document.getElementById("installModal"),
+  closeModalBtn: document.getElementById("closeModalBtn"),
+};
+
+const state = {
+  currentRotation: 0,
+  spinTimeoutId: null,
+  deferredPrompt: null,
+};
+
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-const installModal = document.getElementById("installModal");
-const closeModalBtn = document.getElementById("closeModalBtn");
 
-let currentRotation = 0;
-let spinTimeoutId = null;
-
-loginBtn.addEventListener("click", () => {
-  const name = usernameInput.value.trim();
-  if (name) {
-    localStorage.setItem("username", name);
-    showApp();
+function getStoredText(key) {
+  try {
+    return localStorage.getItem(key) || "";
+  } catch {
+    return "";
   }
-});
-
-logoutBtn.addEventListener("click", () => {
-  localStorage.removeItem("username");
-  localStorage.removeItem("history");
-  resetAppState();
-  appSection.style.display = "none";
-  loginSection.style.display = "block";
-});
-
-clearHistoryBtn.addEventListener("click", () => {
-  localStorage.removeItem("history");
-  historyList.innerHTML = "";
-  historyTitle.style.display = "none";
-  result.textContent = "История выигрышей удалена.";
-});
-
-spinBtn.addEventListener("click", () => {
-  spinBtn.disabled = true;
-  result.textContent = "Крутим...";
-
-  const index = Math.floor(Math.random() * prizes.length);
-  const prize = prizes[index];
-  const degreesPerSegment = 360 / prizes.length;
-  const randomOffset = Math.floor(Math.random() * (degreesPerSegment - 5)); // небольшой разброс
-  const segmentRotation = 360 * 5 + index * degreesPerSegment + randomOffset;
-
-  currentRotation += segmentRotation;
-
-  wheel.style.transition = "transform 4s cubic-bezier(0.33, 1, 0.68, 1)";
-  wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-  spinTimeoutId = setTimeout(() => {
-    result.textContent = "Вы выиграли: " + prize + "!";
-
-    const history = JSON.parse(localStorage.getItem("history")) || [];
-    history.push(prize);
-    localStorage.setItem("history", JSON.stringify(history));
-    renderHistory();
-
-    spinBtn.disabled = false;
-    spinTimeoutId = null;
-  }, 4000);
-});
-
-function resetAppState() {
-  if (spinTimeoutId) {
-    clearTimeout(spinTimeoutId);
-    spinTimeoutId = null;
-  }
-
-  currentRotation = 0;
-  wheel.style.transition = "none";
-  wheel.style.transform = "rotate(0deg)";
-  wheel.offsetHeight; // принудительный reflow, чтобы мгновенный сброс применился
-  wheel.style.transition = "transform 4s cubic-bezier(0.33, 1, 0.68, 1)";
-
-  spinBtn.disabled = false;
-  result.textContent = "";
-  historyList.innerHTML = "";
-  historyTitle.style.display = "none";
-  userNameDisplay.textContent = "";
-  usernameInput.value = "";
-  installModal.style.display = "none";
 }
 
-function renderHistory() {
-  const history = JSON.parse(localStorage.getItem("history")) || [];
-  historyTitle.style.display = history.length ? "block" : "none";
-  historyList.innerHTML = "";
+function setStoredText(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // noop: storage may be unavailable in private contexts
+  }
+}
+
+function removeStoredItem(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // noop
+  }
+}
+
+function getHistory() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.history);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function setHistory(history) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(history));
+  } catch {
+    // noop
+  }
+}
+
+function renderHistory(history = getHistory()) {
+  el.historyTitle.style.display = history.length ? "block" : "none";
+  el.historyList.innerHTML = "";
+
   history.forEach((item) => {
     const li = document.createElement("li");
     li.textContent = item;
-    historyList.appendChild(li);
+    el.historyList.appendChild(li);
   });
 }
 
-function showApp() {
-  const username = localStorage.getItem("username");
-  if (username) {
-    userNameDisplay.textContent = username;
-    loginSection.style.display = "none";
-    appSection.style.display = "block";
-    renderHistory();
+function clearHistory(withMessage = true) {
+  removeStoredItem(STORAGE_KEYS.history);
+  renderHistory([]);
+  if (withMessage) {
+    el.result.textContent = "История выигрышей удалена.";
   }
 }
 
-showApp();
+function setAuthView(isLoggedIn) {
+  el.loginSection.style.display = isLoggedIn ? "none" : "block";
+  el.appSection.style.display = isLoggedIn ? "block" : "none";
+}
 
-// Установка PWA
-let deferredPrompt;
+function resetWheelVisual() {
+  state.currentRotation = 0;
+  el.wheel.style.transition = "none";
+  el.wheel.style.transform = "rotate(0deg)";
+  void el.wheel.offsetHeight; // force reflow for immediate transform reset
+  el.wheel.style.transition = SPIN_EASING;
+}
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = "inline-block";
-});
+function cancelSpinIfRunning() {
+  if (!state.spinTimeoutId) {
+    return;
+  }
 
-installBtn.addEventListener("click", () => {
-  if (isMobile) {
-    // Показываем модальное окно с инструкцией
-    installModal.style.display = "block";
-  } else if (deferredPrompt) {
-    // Десктопное стандартное поведение
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choice) => {
+  clearTimeout(state.spinTimeoutId);
+  state.spinTimeoutId = null;
+  el.spinBtn.disabled = false;
+}
+
+function resetAppState() {
+  cancelSpinIfRunning();
+  resetWheelVisual();
+
+  el.result.textContent = "";
+  el.userNameDisplay.textContent = "";
+  el.usernameInput.value = "";
+  el.installModal.style.display = "none";
+
+  renderHistory([]);
+}
+
+function handleLogin() {
+  const username = el.usernameInput.value.trim();
+  if (!username) {
+    return;
+  }
+
+  setStoredText(STORAGE_KEYS.username, username);
+  el.userNameDisplay.textContent = username;
+  setAuthView(true);
+  renderHistory();
+}
+
+function handleLogout() {
+  removeStoredItem(STORAGE_KEYS.username);
+  clearHistory(false);
+  resetAppState();
+  setAuthView(false);
+}
+
+function handleSpin() {
+  if (state.spinTimeoutId) {
+    return;
+  }
+
+  el.spinBtn.disabled = true;
+  el.result.textContent = "Крутим...";
+
+  const index = Math.floor(Math.random() * PRIZES.length);
+  const prize = PRIZES[index];
+  const degreesPerSegment = 360 / PRIZES.length;
+  const randomOffset = Math.floor(Math.random() * (degreesPerSegment - 5));
+  const segmentRotation = 360 * 5 + index * degreesPerSegment + randomOffset;
+
+  state.currentRotation += segmentRotation;
+  el.wheel.style.transition = SPIN_EASING;
+  el.wheel.style.transform = `rotate(${state.currentRotation}deg)`;
+
+  state.spinTimeoutId = setTimeout(() => {
+    el.result.textContent = `Вы выиграли: ${prize}!`;
+
+    const history = getHistory();
+    history.push(prize);
+    setHistory(history);
+    renderHistory(history);
+
+    el.spinBtn.disabled = false;
+    state.spinTimeoutId = null;
+  }, SPIN_DURATION_MS);
+}
+
+function initInstallPrompt() {
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    state.deferredPrompt = event;
+    el.installBtn.style.display = "inline-block";
+  });
+
+  el.installBtn.addEventListener("click", () => {
+    if (isMobile) {
+      el.installModal.style.display = "block";
+      return;
+    }
+
+    if (!state.deferredPrompt) {
+      return;
+    }
+
+    state.deferredPrompt.prompt();
+    state.deferredPrompt.userChoice.then((choice) => {
       if (choice.outcome === "accepted") {
-        installBtn.style.display = "none";
+        el.installBtn.style.display = "none";
       }
-      deferredPrompt = null;
+      state.deferredPrompt = null;
     });
-  }
-});
+  });
 
-// Регистрация service worker
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js").then(() => {
-    console.log("[PWA] Service Worker зарегистрирован");
+  el.closeModalBtn.addEventListener("click", () => {
+    el.installModal.style.display = "none";
+  });
+
+  window.addEventListener("click", (event) => {
+    if (event.target === el.installModal) {
+      el.installModal.style.display = "none";
+    }
   });
 }
 
-closeModalBtn.addEventListener("click", () => {
-  installModal.style.display = "none";
-});
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    return;
+  }
+
+  navigator.serviceWorker
+    .register("service-worker.js")
+    .then(() => {
+      console.log("[PWA] Service Worker зарегистрирован");
+    })
+    .catch((error) => {
+      console.error("[PWA] Ошибка регистрации Service Worker:", error);
+    });
+}
+
+function bindEvents() {
+  el.loginBtn.addEventListener("click", handleLogin);
+  el.logoutBtn.addEventListener("click", handleLogout);
+  el.clearHistoryBtn.addEventListener("click", () => clearHistory(true));
+  el.spinBtn.addEventListener("click", handleSpin);
+
+  el.usernameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      handleLogin();
+    }
+  });
+}
+
+function init() {
+  bindEvents();
+  initInstallPrompt();
+  registerServiceWorker();
+
+  const username = getStoredText(STORAGE_KEYS.username);
+  if (!username) {
+    resetAppState();
+    setAuthView(false);
+    return;
+  }
+
+  el.userNameDisplay.textContent = username;
+  setAuthView(true);
+  renderHistory();
+}
+
+init();

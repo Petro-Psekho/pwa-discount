@@ -12,23 +12,23 @@
     <div id="loginSection">
       <h2>Введите ваше имя:</h2>
       <input type="text" id="username" placeholder="Ваше имя" />
-      <button id="loginBtn">Войти</button>
+      <button id="loginBtn" type="button">Войти</button>
     </div>
 
     <div id="appSection" style="display: none">
       <h1>Привет, <span id="userNameDisplay"></span>!</h1>
 
       <div id="wheel" class="wheel"></div>
-      <button id="spinBtn">🎡 Крутить колесо</button>
-      <p id="result"></p>
+      <button id="spinBtn" type="button">🎡 Крутить колесо</button>
+      <p id="result" aria-live="polite"></p>
 
       <h3 id="historyTitle">История выигрышей:</h3>
       <ul id="historyList"></ul>
 
       <br />
-      <button id="installBtn" style="display: none">📲 Установить приложение</button>
-      <button id="clearHistoryBtn">🗑️ Удалить историю</button>
-      <button id="logoutBtn">🚪 Выйти</button>
+      <button id="installBtn" type="button" style="display: none">📲 Установить приложение</button>
+      <button id="clearHistoryBtn" type="button">🗑️ Удалить историю</button>
+      <button id="logoutBtn" type="button">🚪 Выйти</button>
     </div>
 
     <div id="installModal" class="modal">
@@ -39,7 +39,7 @@
           <strong>На Android:</strong> нажмите меню браузера (⋮) и выберите «Установить приложение».
         </p>
         <p>
-          <strong>На iPhone:</strong> нажмите кнопку «Поделиться» и выберите «На экран \"Домой\"».
+          <strong>На iPhone:</strong> нажмите кнопку «Поделиться» и выберите «На экран "Домой"».
         </p>
       </div>
     </div>

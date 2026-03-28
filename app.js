@@ -8,6 +8,7 @@ const usernameInput = document.getElementById("username");
 const userNameDisplay = document.getElementById("userNameDisplay");
 const loginSection = document.getElementById("loginSection");
 const appSection = document.getElementById("appSection");
+const historyTitle = document.getElementById("historyTitle");
 const historyList = document.getElementById("historyList");
 const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 const installBtn = document.getElementById("installBtn");
@@ -34,6 +35,7 @@ logoutBtn.addEventListener("click", () => {
 clearHistoryBtn.addEventListener("click", () => {
   localStorage.removeItem("history");
   historyList.innerHTML = "";
+  historyTitle.style.display = "none";
   result.textContent = "История выигрышей удалена.";
 });
 
@@ -66,6 +68,7 @@ spinBtn.addEventListener("click", () => {
 
 function renderHistory() {
   const history = JSON.parse(localStorage.getItem("history")) || [];
+  historyTitle.style.display = history.length ? "block" : "none";
   historyList.innerHTML = "";
   history.forEach((item) => {
     const li = document.createElement("li");

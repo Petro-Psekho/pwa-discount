@@ -17,6 +17,7 @@ const installModal = document.getElementById("installModal");
 const closeModalBtn = document.getElementById("closeModalBtn");
 
 let currentRotation = 0;
+let spinTimeoutId = null;
 
 loginBtn.addEventListener("click", () => {
   const name = usernameInput.value.trim();
@@ -28,6 +29,8 @@ loginBtn.addEventListener("click", () => {
 
 logoutBtn.addEventListener("click", () => {
   localStorage.removeItem("username");
+  localStorage.removeItem("history");
+  resetAppState();
   appSection.style.display = "none";
   loginSection.style.display = "block";
 });
@@ -54,7 +57,7 @@ spinBtn.addEventListener("click", () => {
   wheel.style.transition = "transform 4s cubic-bezier(0.33, 1, 0.68, 1)";
   wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-  setTimeout(() => {
+  spinTimeoutId = setTimeout(() => {
     result.textContent = "Вы выиграли: " + prize + "!";
 
     const history = JSON.parse(localStorage.getItem("history")) || [];
@@ -63,8 +66,30 @@ spinBtn.addEventListener("click", () => {
     renderHistory();
 
     spinBtn.disabled = false;
+    spinTimeoutId = null;
   }, 4000);
 });
+
+function resetAppState() {
+  if (spinTimeoutId) {
+    clearTimeout(spinTimeoutId);
+    spinTimeoutId = null;
+  }
+
+  currentRotation = 0;
+  wheel.style.transition = "none";
+  wheel.style.transform = "rotate(0deg)";
+  wheel.offsetHeight; // принудительный reflow, чтобы мгновенный сброс применился
+  wheel.style.transition = "transform 4s cubic-bezier(0.33, 1, 0.68, 1)";
+
+  spinBtn.disabled = false;
+  result.textContent = "";
+  historyList.innerHTML = "";
+  historyTitle.style.display = "none";
+  userNameDisplay.textContent = "";
+  usernameInput.value = "";
+  installModal.style.display = "none";
+}
 
 function renderHistory() {
   const history = JSON.parse(localStorage.getItem("history")) || [];

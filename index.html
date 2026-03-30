@@ -16,7 +16,7 @@
     </div>
 
     <div id="appSection" style="display: none">
-      <h1>Привет, <span id="userNameDisplay"></span>!</h1>
+      <h1 class="color-blue">Привет, <span id="userNameDisplay"></span>!</h1>
 
       <div class="wheel-wrap">
         <div id="wheel" class="wheel"></div>
@@ -27,10 +27,11 @@
       <h3 id="historyTitle">История выигрышей:</h3>
       <ul id="historyList"></ul>
 
-      <br />
-      <button id="installBtn" type="button" style="display: none">📲 Установить приложение</button>
-      <button id="clearHistoryBtn" type="button">🗑️ Удалить историю</button>
-      <button id="logoutBtn" type="button">🚪 Выйти</button>
+      <div class="actions">
+        <button id="installBtn" type="button">📲 Установить приложение</button>
+        <button id="clearHistoryBtn" type="button">🗑️ Удалить историю</button>
+        <button id="logoutBtn" type="button">🚪 Выйти</button>
+      </div>
     </div>
 
     <div id="installModal" class="modal">

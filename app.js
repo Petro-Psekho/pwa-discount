@@ -182,16 +182,11 @@ function initInstallPrompt() {
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     state.deferredPrompt = event;
-    el.installBtn.style.display = "inline-block";
   });
 
   el.installBtn.addEventListener("click", () => {
-    if (isMobile) {
+    if (isMobile || !state.deferredPrompt) {
       el.installModal.style.display = "block";
-      return;
-    }
-
-    if (!state.deferredPrompt) {
       return;
     }
 
